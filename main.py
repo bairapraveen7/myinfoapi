@@ -8,7 +8,8 @@ app = FastAPI()
 app.include_router(router, prefix="/v1/todos", tags=["todo"])
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://kind-ground-0d0ce4a0f.7.azurestaticapps.net"
 ]
 
 app.add_middleware(
