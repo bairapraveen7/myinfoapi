@@ -4,7 +4,7 @@ import pyodbc
 def get_db_connection():
     try:
         server = 'azure-learn-db.database.windows.net'
-        database = 'azure-learn-db'
+        database = 'profile'
         username = 'CloudSAf8467395'
         password = 'haisiri@123456'
         connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'

@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from route.todo_v1 import router
+from route.profile_v1 import router
 
 
 app = FastAPI()
 
-app.include_router(router, prefix="/v1/todos", tags=["todo"])
+# app.include_router(router, prefix="/v1/todos", tags=["todo"])
+app.include_router(router, prefix="/v1/profile", tags=["profile"])
 
 origins = [
     "http://localhost:3000",
