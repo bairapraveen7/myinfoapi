@@ -16,7 +16,7 @@ def get_user_skills(cursor,user_id):
 
 def get_user_experience(cursor,user_id):
     try:
-        cursor.execute("SELECT company_name, job_title, start_date, end_date FROM experience WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT id, company_name, job_title, location, start_date, end_date FROM experience WHERE user_id = ? ORDER BY start_date DESC", (user_id,))
         experience = cursor.fetchall()
         return rows_to_dict(cursor, experience)
     except Exception as e:
@@ -24,22 +24,24 @@ def get_user_experience(cursor,user_id):
 
 def get_user_info(cursor,user_id):
     try:
-        cursor.execute("SELECT name,description, email,linkedin,github FROM users WHERE id = ?", (user_id,))
+        cursor.execute("SELECT name,description, email,linkedin,github,dp_image_path FROM users WHERE id = ?", (user_id,))
         user_info = cursor.fetchone()
-        return rows_to_dict(cursor, [user_info])[0]
+        output = rows_to_dict(cursor, [user_info])[0]
+        output['dp_image_path'] = 'https://praveenazurelearn.blob.core.windows.net/azureimages' + output['dp_image_path'] if output['dp_image_path'] else None
+        return output
     except Exception as e:
         raise Exception("Error fetching user info: " + str(e))
 
 def get_user_projects(cursor,user_id):
     try:
-        cursor.execute("select p.id,p.title as project_name,p.description,t.name as tool_name from projects p left join project_tools pt on p.id = pt.project_id left join tools t on pt.tool_id = t.id where p.user_id = ?", (user_id,))
+        cursor.execute("select p.id,p.title as name,p.description,t.name as tool_name from projects p left join project_tools pt on p.id = pt.project_id left join tools t on pt.tool_id = t.id where p.user_id = ?", (user_id,))
         projects = rows_to_dict(cursor, cursor.fetchall())
         output = {}
         for project in projects:
             project_id = project['id']
             if project_id not in output:
                 output[project_id] = {
-                    'project_name': project['project_name'],
+                    'name': project['name'],
                     'description': project['description'],
                     'tools': []
                 }
@@ -69,11 +71,18 @@ def get_user_experience_details_db(experience_id):
     db = get_db_connection()
     try:
         cursor = db.cursor()
-        cursor.execute("SELECT company_name, job_title, start_date, end_date, description FROM experience WHERE id = ?", (experience_id,))
-        experience = rows_to_dict(cursor, [cursor.fetchone()])
-        if not experience:
+        cursor.execute("SELECT e.id, e.description,s.name as skill FROM experience e inner join experience_skills es on e.id = es.experience_id inner join skills s on es.skill_id = s.id WHERE e.id = ?", (experience_id,))
+        experience = rows_to_dict(cursor, cursor.fetchall())
+        output = {}
+        for exp in experience:
+            output[exp['id']] = {
+                'id'   : exp['id'],
+                'description': exp['description'],
+                'skills': output.get(exp['id'], {}).get('skills', []) + [exp['skill']]
+            }
+        if not output:
             return JSONResponse(content={"error": "Experience not found"}, status_code=404)
-        return JSONResponse(content=jsonable_encoder(experience), status_code=200)
+        return JSONResponse(content=jsonable_encoder(list(output.values())), status_code=200)
     except Exception as e:
         raise e
     finally:
