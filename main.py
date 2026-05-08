@@ -14,7 +14,7 @@ app.include_router(router, prefix="/v1/profile", tags=["profile"])
 
 origins = [
     "http://localhost:3000",
-    "https://kind-ground-0d0ce4a0f.7.azurestaticapps.net"
+    "https://praveenbaira.com"
 ]
 
 app.add_middleware(
