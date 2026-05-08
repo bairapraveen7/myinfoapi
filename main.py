@@ -14,7 +14,7 @@ app.include_router(router, prefix="/v1/profile", tags=["profile"])
 
 origins = [
     "http://localhost:3000",
-    "https://praveenbaira.com"
+    "https://www.praveenbaira.com"
 ]
 
 app.add_middleware(
