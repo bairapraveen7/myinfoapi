@@ -34,7 +34,7 @@ def get_user_info(cursor,user_id):
 
 def get_user_projects(cursor,user_id):
     try:
-        cursor.execute("select p.id,p.title as name,p.description,t.name as tool_name from projects p left join project_tools pt on p.id = pt.project_id left join tools t on pt.tool_id = t.id where p.user_id = ?", (user_id,))
+        cursor.execute("select p.id,p.title as name,p.description,p.github_link,t.name as tool_name from projects p left join project_tools pt on p.id = pt.project_id left join tools t on pt.tool_id = t.id where p.user_id = ?", (user_id,))
         projects = rows_to_dict(cursor, cursor.fetchall())
         output = {}
         for project in projects:
