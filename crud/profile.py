@@ -43,6 +43,7 @@ def get_user_projects(cursor,user_id):
                 output[project_id] = {
                     'name': project['name'],
                     'description': project['description'],
+                    'github_link': project['github_link'],
                     'tools': []
                 }
             if project['tool_name']:
